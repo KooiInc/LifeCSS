@@ -1,0 +1,16 @@
+{
+  "name": "lifecss",
+  "version": "0.1.0",
+  "description": "Helper methods for Stackblitz ecmascript projects",
+  "keywords": ["Stackblitz", "es20xx", "utility"],
+  "author": "KooiInc",
+  "license": "CCO-1.0",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/KooiInc/LifeCSS/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LifeCSS.git"
+  }
+}
