@@ -2,7 +2,7 @@ export default LifeStyleFactory;
 
 function LifeStyleFactory({styleSheet, createWithId}) {
   const {cssRuleFromText, mediaRuleFromText, checkAtRules, toDashedNotation,
-    ruleExists, checkParams, tryAddOrModify, createSheet} = getHelpers(styleSheet);
+    ruleExists, checkParams, consider, createSheet} = getHelpers(styleSheet);
 
   styleSheet = createWithId ? createSheet(createWithId) : styleSheet;
 
@@ -14,17 +14,19 @@ function LifeStyleFactory({styleSheet, createWithId}) {
     const rule4Selector = exists
       || sheetOrMediaRules.cssRules[sheetOrMediaRules.insertRule(`${selector} {}`,
         sheetOrMediaRules.cssRules.length || 0)];
-    return tryAddOrModify( () => setRule4Selector(rule4Selector, styleRules), selector, exists );
+    return consider( () => setRule4Selector(rule4Selector, styleRules), selector, exists );
   };
 
   const setMediaRule = (selector, styleValues) => {
     const exists = ruleExists(selector, true);
-    const mediaCssRule =  exists ||
-      styleSheet.cssRules[styleSheet.insertRule(`${selector} {}`, styleSheet.cssRules.length || 0)];
+    consider( () => {
+      const mediaCssRule =  exists ||
+        styleSheet.cssRules[styleSheet.insertRule(`${selector} {}`, styleSheet.cssRules.length || 0)];
 
-    return tryAddOrModify( () =>
-      Object.entries(styleValues).forEach( ([selector, cssRule]) =>
-        setRules(selector, cssRule, mediaCssRule)), selector, exists);
+      return consider( () =>
+        Object.entries(styleValues).forEach( ([selector, cssRule]) =>
+          setRules(selector, cssRule, mediaCssRule)), selector, exists);
+    }, exists);
   };
 
   const styleFromObject = (selector, rulesObj) =>
@@ -57,8 +59,11 @@ function LifeStyleFactory({styleSheet, createWithId}) {
 }
 
 function getHelpers(styleSheet) {
+  const notification = `Note: The rule or some of its properties may not be supported by your browser (yet)`;
+
   const createSheet = id => document.head.insertAdjacentElement(`beforeend`,
     Object.assign( document.createElement(`style`), { id, type: `text/css` } )).sheet;
+
   const createRE = (regexStr, ...args) => {
     const flags = args.length && Array.isArray(args.slice(-1)) ? args.pop().join(``) : ``;
 
@@ -70,6 +75,7 @@ function getHelpers(styleSheet) {
         .map( line => line.replace(/\s|\/\/.*$/g, ``).trim().replace(/(@s!)/g, ` `) )
         .join(``), flags);
   };
+
   const ruleExists = (ruleFragOrSelector, isSelector) => [...styleSheet.rules].find(r =>
     isSelector ?
       compareSelectors((r.selectorText || ``), ruleFragOrSelector) :
@@ -98,6 +104,7 @@ function getHelpers(styleSheet) {
         | @namespace
         | @page
         | @counter-style
+        | @container
         ${[`i`]}`;
 
   const cssRuleFromText = rule =>
@@ -106,10 +113,10 @@ function getHelpers(styleSheet) {
       .replace(/[}{]/, ``)
       .split(`\n`).map(r => r.trim())
       .filter(v => v).reduce( (acc, v) => {
-        const [key, value] = [
-          v.slice(0, v.indexOf(`:`)).trim(),
-          v.slice(v.indexOf(`:`) + 1).trim().replace(/;$|;.+(?=\/*).+\/$/, ``)];
-        return key && value ? {...acc, [key]: value} : acc; }, {} );
+      const [key, value] = [
+        v.slice(0, v.indexOf(`:`)).trim(),
+        v.slice(v.indexOf(`:`) + 1).trim().replace(/;$|;.+(?=\/*).+\/$/, ``)];
+      return key && value ? {...acc, [key]: value} : acc; }, {} );
 
   const mediaRuleFromText = selector =>
     selector
@@ -139,21 +146,23 @@ function getHelpers(styleSheet) {
     } catch(err) {
       return (console.error(`StylingFactory instance (tryParse) ${err.name} Error:\n${
         err.message}\nRule (truncated): ${
-        cssDeclarationString.slice(0, 50).replace(/\n/g, `\\n`).replace(/\s{2,}/g, ` `)} ...`),
+        cssDeclarationString.slice(0, 50).replace(/\n/g, `\\n`).replace(/\s{2,}/g, ` `)} ...\n${
+        notification}`),
         exists);
     }
   };
 
-  const tryAddOrModify = (fn, rule, existing) => {
+  const consider = (fn, rule, existing) => {
     try {
       return (fn(), existing);
     } catch(err) {
       return (console.error(`StylingFactory instance (tryAddOrModify) ${err.name} Error:\n${
         err.message}\nRule (truncated): ${
-        rule.trim().slice(0, 50).replace(/\n/g, `\\n`).replace(/\s{2,}/g, ` `)} ...`),
+        (rule || `NO RULE`).trim().slice(0, 50).replace(/\n/g, `\\n`).replace(/\s{2,}/g, ` `)} ...\n${
+        notification}`),
         existing);
     }
   }
   return {cssRuleFromText, mediaRuleFromText, checkAtRules, ruleExists,
-    toDashedNotation, checkParams, tryParse, tryAddOrModify, createSheet};
+    toDashedNotation, checkParams, tryParse, consider, createSheet};
 }
