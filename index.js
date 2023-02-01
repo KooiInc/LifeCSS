@@ -2,14 +2,12 @@ export default LifeStyleFactory;
 
 function LifeStyleFactory({styleSheet, createWithId}) {
   const {cssRuleFromText, checkAtRules, toDashedNotation,
-    ruleExists, checkParams, consider, createSheet} = getHelpers(styleSheet);
-
-  styleSheet = createWithId ? createSheet(createWithId) : styleSheet;
+    ruleExists, checkParams, consider, atMedia2String, sheet} = getHelpers({styleSheet, createWithId});
 
   const setRule4Selector = (rule, properties) => Object.entries(properties)
     .forEach( ([prop, value]) => rule.style.setProperty(toDashedNotation(prop), value));
 
-  const setRules = (selector, styleRules, sheetOrMediaRules = styleSheet) => {
+  const setRules = (selector, styleRules, sheetOrMediaRules = sheet) => {
     const exists = ruleExists(selector, true);
     const rule4Selector = exists
       || sheetOrMediaRules.cssRules[sheetOrMediaRules.insertRule(`${selector} {}`,
@@ -17,7 +15,8 @@ function LifeStyleFactory({styleSheet, createWithId}) {
     return consider( () => setRule4Selector(rule4Selector, styleRules), selector, exists );
   };
 
-  const styleFromObject = (selector, rulesObj) => setRules(selector, rulesObj);
+  const stringifyMediaRule = mediaObj => Object.entries(mediaObj)
+    .map( ([key, value]) => `${key}: ${value.trim()}`).join(`;\n`);
 
   const doParse = cssDeclarationString => {
     const rule = cssDeclarationString.trim().split(/{/, 2);
@@ -32,6 +31,13 @@ function LifeStyleFactory({styleSheet, createWithId}) {
     return checkAts.done ? checkAts.existing : doParse(cssDeclarationString);
   }
 
+  const styleFromObject = (selector, rulesObj) => {
+    if (selector.trim().startsWith(`@media`)) {
+      return styleFromString(atMedia2String(selector, rulesObj));
+    }
+    return setRules(selector, rulesObj);
+  };
+
   return (cssBlockOrSelector, rulesObj = {}) =>
     checkParams(cssBlockOrSelector, rulesObj) && (
       Object.keys(rulesObj).length ?
@@ -39,14 +45,13 @@ function LifeStyleFactory({styleSheet, createWithId}) {
         styleFromString(cssBlockOrSelector) );
 }
 
-function getHelpers(styleSheet) {
+function getHelpers({styleSheet, createWithId}) {
   const notification = `Note: The rule or some of its properties may not be supported by your browser (yet)`;
 
-  const createSheet = id => {
-    styleSheet = document.head.insertAdjacentElement(`beforeend`,
+  const createSheet = id => document.head.insertAdjacentElement(`beforeend`,
       Object.assign( document.createElement(`style`), { id, type: `text/css` } )).sheet;
-    return styleSheet;
-  };
+
+  styleSheet = createWithId ? createSheet(createWithId) : styleSheet;
 
   const createRE = (regexStr, ...args) => {
     const flags = args.length && Array.isArray(args.slice(-1)) ? args.pop().join(``) : ``;
@@ -128,6 +133,14 @@ function getHelpers(styleSheet) {
     }
   };
 
+  const stringifyMediaRule = mediaObj => Object.entries(mediaObj)
+    .map( ([key, value]) => `${key}: ${value.trim()}`).join(`;\n`);
+
+  const atMedia2String = (selector, rulesObj) => `${selector.trim()} ${
+    Object.entries(rulesObj).map( ( [ selectr, rule] ) =>
+      `${selectr}: { ${stringifyMediaRule(rule) }` ) }` ;
+
+
   const consider = (fn, rule, existing) => {
     try {
       return (fn(), existing);
@@ -139,6 +152,9 @@ function getHelpers(styleSheet) {
         existing);
     }
   }
-  return {cssRuleFromText, checkAtRules, ruleExists,
-    toDashedNotation, checkParams, tryParse, consider, createSheet};
+
+  return {
+    get sheet() {return styleSheet;},
+    cssRuleFromText, checkAtRules, ruleExists, atMedia2String,
+    toDashedNotation, checkParams, tryParse, consider};
 }
