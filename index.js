@@ -15,9 +15,6 @@ function LifeStyleFactory({styleSheet, createWithId}) {
     return consider( () => setRule4Selector(rule4Selector, styleRules), selector, exists );
   };
 
-  const stringifyMediaRule = mediaObj => Object.entries(mediaObj)
-    .map( ([key, value]) => `${key}: ${value.trim()}`).join(`;\n`);
-
   const doParse = cssDeclarationString => {
     const rule = cssDeclarationString.trim().split(/{/, 2);
     const selector = rule.shift().trim();
