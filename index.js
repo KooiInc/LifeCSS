@@ -61,7 +61,7 @@ function LifeStyleFactory({styleSheet, createWithId}) {
 function getHelpers(styleSheet) {
   const notification = `Note: The rule or some of its properties may not be supported by your browser (yet)`;
 
-  const createSheet = id => document.head.insertAdjacentElement(`beforeend`,
+  const createSheet = id => styleSheet = document.head.insertAdjacentElement(`beforeend`,
     Object.assign( document.createElement(`style`), { id, type: `text/css` } )).sheet;
 
   const createRE = (regexStr, ...args) => {
