@@ -1,7 +1,7 @@
 {
   "name": "lifecss",
-  "version": "0.1.4",
-  "description": "Helper methods for Stackblitz ecmascript projects",
+  "version": "0.1.5",
+  "description": "Create style rules in situ",
   "keywords": ["CSS", "Stylesheet", "utility"],
   "author": "KooiInc",
   "license": "GNU",
