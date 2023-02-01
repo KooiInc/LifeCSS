@@ -1,6 +1,6 @@
 {
   "name": "lifecss",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Helper methods for Stackblitz ecmascript projects",
   "keywords": ["CSS", "Stylesheet", "utility"],
   "author": "KooiInc",

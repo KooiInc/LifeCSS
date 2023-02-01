@@ -153,7 +153,7 @@ function getHelpers({styleSheet, createWithId}) {
   }
 
   return {
-    get sheet() {return styleSheet;},
+    sheet: styleSheet,
     cssRuleFromText, checkAtRules, ruleExists, atMedia2String,
     toDashedNotation, checkParams, tryParse, consider};
 }
