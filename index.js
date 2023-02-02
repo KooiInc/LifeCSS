@@ -45,7 +45,7 @@ function LifeStyleFactory({styleSheet, createWithId}) {
 function getHelpers({styleSheet, createWithId}) {
   const notification = `Note: The rule or some of its properties may not be supported by your browser (yet)`;
 
-  const escape4RegExp = str => str.replace(/([\*\[\]()-+{}.$\?\\])/g, '\\$1');
+  const escape4RegExp = str => str.replace(/([*\[\]()-+{}.$?\\])/g, '\\$1');
 
   const createSheet = id => document.head.insertAdjacentElement(`beforeend`,
       Object.assign( document.createElement(`style`), { id, type: `text/css` } )).sheet;
@@ -120,7 +120,7 @@ function getHelpers({styleSheet, createWithId}) {
 
   const tryParse = cssDeclarationString => {
     cssDeclarationString = cssDeclarationString.trim();
-    const exists = !!ruleExists(cssDeclarationString.slice(0, cssDeclarationString.indexOf(` `)));
+    const exists = !!ruleExists(cssDeclarationString.slice(0, cssDeclarationString.indexOf(`{`)));
     try {
       return (styleSheet.insertRule(`${cssDeclarationString}`, styleSheet.cssRules.length), exists);
     } catch(err) {
