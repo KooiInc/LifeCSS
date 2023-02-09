@@ -1,6 +1,6 @@
 {
   "name": "lifecss",
-  "version": "0.1.9",
+  "version": "0.2.0",
   "description": "Create style rules in situ",
   "keywords": ["CSS", "Stylesheet", "utility"],
   "author": "KooiInc",

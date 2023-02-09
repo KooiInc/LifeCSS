@@ -85,7 +85,9 @@ function getHelpers({styleSheet, createWithId}) {
         { ok: false, done: false };
 
   const IS = (obj, shouldBe) => {
-    const self = obj === 0 ? Number : obj && Object.getPrototypeOf(obj || ``)?.constructor || typeof obj;
+    const self = obj === 0 ?
+      Number : obj === `` ? String :
+        obj && Object.getPrototypeOf(obj || ``)?.constructor || typeof obj;
     return shouldBe ? shouldBe === self : self.name;
   };
 
