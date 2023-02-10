@@ -84,24 +84,22 @@ function getHelpers({styleSheet, createWithId}) {
         { ok: tryParse(cssDeclarationString, styleSheet.cssRules.length), done: true } :
         { ok: false, done: false };
 
-  const IS = (obj, shouldBe) => {
-    const self = obj === 0 ?
-      Number : obj === `` ? String :
-        obj && Object.getPrototypeOf(obj || ``)?.constructor || typeof obj;
-    return shouldBe ? shouldBe === self?.__proto__ || shouldBe === self : self.name;
+  const ISOneOf = (obj, ...params) => !!params.find( param => IS(obj, param) );
+  const IS = (obj, ...shouldBe) => {
+    if (shouldBe.length > 1) {
+      return ISOneOf(obj, ...shouldBe);
+    }
+    shouldBe = shouldBe.shift();
+    const invalid = `Invalid parameter(s)`;
+    const self = obj === 0 ? Number : obj === `` ? String :
+      !obj ? {name: invalid} :
+        Object.getPrototypeOf(obj)?.constructor;
+    return shouldBe ? shouldBe === self?.__proto__ || shouldBe === self :
+      self?.name ?? invalid;
   };
 
-  const atRulesRE = createRE`
-      @keyframes
-    | @font-feature-values
-    | @font-palette-values
-    | @layer
-    | @namespace
-    | @page
-    | @counter-style
-    | @container
-    | @media
-    ${[`i`]}`;
+  const atRulesRE = createRE`@keyframes | @font-feature-values | @font-palette-values 
+    | @layer | @namespace | @page | @counter-style | @container | @media ${[`i`]}`;
 
   const cssRuleFromText = rule =>
     rule[0]
