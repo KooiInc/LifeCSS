@@ -88,7 +88,7 @@ function getHelpers({styleSheet, createWithId}) {
     const self = obj === 0 ?
       Number : obj === `` ? String :
         obj && Object.getPrototypeOf(obj || ``)?.constructor || typeof obj;
-    return shouldBe ? shouldBe === self : self.name;
+    return shouldBe ? shouldBe === self?.__proto__ || shouldBe === self : self.name;
   };
 
   const atRulesRE = createRE`
