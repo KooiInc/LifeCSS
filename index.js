@@ -101,17 +101,19 @@ function getHelpers({styleSheet, createWithId}) {
   const atRulesRE = createRE`@keyframes | @font-feature-values | @font-palette-values 
     | @layer | @namespace | @page | @counter-style | @container | @media ${[`i`]}`;
 
-  const cssRuleFromText = rule =>
-    rule[0]
+  const cssRuleFromText = rule => {
+    rule = !/\n/.test(rule) ? rule.split(`;`).join(`;\n`) : rule;
+    console.log(rule);
+    return rule
       .trim()
       .replace(/[}{]/, ``)
       .split(`\n`).map(r => r.trim())
       .filter(v => v).reduce( (acc, v) => {
-      const [key, value] = [
-        v.slice(0, v.indexOf(`:`)).trim(),
-        v.slice(v.indexOf(`:`) + 1).trim().replace(/;$|;.+(?=\/*).+\/$/, ``)];
-      return key && value ? {...acc, [key]: value} : acc; }, {} );
-
+        const [key, value] = [
+          v.slice(0, v.indexOf(`:`)).trim(),
+          v.slice(v.indexOf(`:`) + 1).trim().replace(/;$|;.+(?=\/*).+\/$/, ``)];
+        return key && value ? {...acc, [key]: value} : acc; }, {} );
+  };
   const toDashedNotation = str2Convert =>
     str2Convert.replace(/[A-Z]/g, a => `-${a.toLowerCase()}`).replace(/[^--]^-|-$/, ``);
 
