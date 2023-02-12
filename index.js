@@ -27,7 +27,7 @@ function LifeStyleFactory({styleSheet, createWithId}) {
       return console.error(`StylingFactory instance (doParse): no (valid) selector could be extracted from rule ${
         shortenRule(cssDeclarationString)}`);
     }
-    const cssRules =  cssRuleFromText(rule);
+    const cssRules =  cssRuleFromText(rule.shift());
     return setRules(selector, cssRules);
   };
 
