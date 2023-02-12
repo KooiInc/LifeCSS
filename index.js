@@ -103,7 +103,6 @@ function getHelpers({styleSheet, createWithId}) {
 
   const cssRuleFromText = rule => {
     rule = !/\n/.test(rule) ? rule.split(`;`).join(`;\n`) : rule;
-    console.log(rule);
     return rule
       .trim()
       .replace(/[}{]/, ``)
