@@ -55,10 +55,11 @@ function getHelpers({styleSheet, createWithId}) {
 
   const escape4RegExp = str => str.replace(/([*\[\]()-+{}.$?\\])/g, '\\$1');
 
-  const createSheet = id => document.head.insertAdjacentElement(`beforeend`,
-    Object.assign( document.createElement(`style`), { id, type: `text/css` } )).sheet;
+  const retrieveOrCreateSheet = id => document.querySelector(`#${id}`)?.sheet ??
+    document.head.insertAdjacentElement(`beforeend`,
+      Object.assign(document.createElement(`style`), {id, type: `text/css`})).sheet;
 
-  styleSheet = createWithId ? createSheet(createWithId) : styleSheet;
+  styleSheet = createWithId ? retrieveOrCreateSheet(createWithId) : styleSheet;
 
   const createRE = (regexStr, ...args) => {
     const flags = args.length && Array.isArray(args.slice(-1)) ? args.pop().join(``) : ``;
