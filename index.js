@@ -4,8 +4,17 @@ function LifeStyleFactory({styleSheet, createWithId}) {
   const {cssRuleFromText, checkAtRules, toDashedNotation, IS, shortenRule, consider,
     ruleExists, checkParams, atMedia2String, sheet} = getHelpers({styleSheet, createWithId});
 
-  const setRule4Selector = (rule, properties) => Object.entries(properties)
-    .forEach( ([prop, value]) => rule.style.setProperty(toDashedNotation(prop), value));
+  const setRule4Selector = (rule, properties) => {
+    Object.entries(properties)
+      .forEach( ([prop, value]) => {
+        let priority;
+        if (/\!important/.test(value)) {
+          value = value.slice(0, value.indexOf(`!important`)).trim();
+          priority = `important`;
+        }
+        rule.style.setProperty(toDashedNotation(prop), value, priority);
+      });
+  }
 
   const setRules = (selector, styleRules, sheetOrMediaRules = sheet) => {
     if (!IS(selector, String) || !selector.trim().length || /[;,]$/g.test(selector.trim())) {
