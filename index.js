@@ -35,7 +35,8 @@ function LifeStyleFactory({styleSheet, createWithId}) {
     const rule4Selector = exists
       || sheetOrMediaRules.cssRules[sheetOrMediaRules.insertRule(`${selector} {}`, sheetOrMediaRules.cssRules.length || 0)];
 
-    if (exists && styleRules.removeRule) {
+    if (styleRules.removeRule) {
+      if (!exists) { return console.error(`Remove rule: ${selector} does not exist`); }
       const ruleIndex =  [...sheet.rules].findIndex(r => compareSelectors((r.selectorText || ``), selector) );
       return consider( () => sheet.deleteRule(ruleIndex) );
     }
