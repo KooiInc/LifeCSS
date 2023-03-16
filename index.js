@@ -1,17 +1,26 @@
 export default LifeStyleFactory;
 
 function LifeStyleFactory({styleSheet, createWithId}) {
-  const {cssRuleFromText, checkAtRules, toDashedNotation, IS, shortenRule, consider,
-    ruleExists, checkParams, atMedia2String, sheet} = getHelpers({styleSheet, createWithId});
+  const { cssRuleFromText, checkAtRules, toDashedNotation, IS, shortenRule, consider,
+    ruleExists, checkParams, atMedia2String, sheet, compareSelectors } = getHelpers({styleSheet, createWithId});
 
   const setRule4Selector = (rule, properties) => {
+    if (rule && properties.removeProperties) {
+      Object.keys(properties.removeProperties).forEach(prop => {
+        rule.style.removeProperty(prop);
+      });
+      return;
+    }
+
     Object.entries(properties)
       .forEach( ([prop, value]) => {
         let priority;
-        if (/\!important/.test(value)) {
+
+        if (/!important/.test(value)) {
           value = value.slice(0, value.indexOf(`!important`)).trim();
           priority = `important`;
         }
+
         rule.style.setProperty(toDashedNotation(prop), value, priority);
       });
   }
@@ -24,19 +33,27 @@ function LifeStyleFactory({styleSheet, createWithId}) {
 
     const exists = ruleExists(selector, true);
     const rule4Selector = exists
-      || sheetOrMediaRules.cssRules[sheetOrMediaRules.insertRule(`${selector} {}`,
-        sheetOrMediaRules.cssRules.length || 0)];
+      || sheetOrMediaRules.cssRules[sheetOrMediaRules.insertRule(`${selector} {}`, sheetOrMediaRules.cssRules.length || 0)];
+
+    if (exists && styleRules.removeRule) {
+      const ruleIndex =  [...sheet.rules].findIndex(r => compareSelectors((r.selectorText || ``), selector) );
+      return consider( () => sheet.deleteRule(ruleIndex) );
+    }
+
     return consider( () => setRule4Selector(rule4Selector, styleRules), selector, exists );
   };
 
   const doParse = cssDeclarationString => {
     const rule = cssDeclarationString.trim().split(/{/, 2);
     const selector = rule.shift().trim();
+
     if (!IS(selector, String) || !selector.trim()) {
       return console.error(`StylingFactory instance (doParse): no (valid) selector could be extracted from rule ${
         shortenRule(cssDeclarationString)}`);
     }
+
     const cssRules =  cssRuleFromText(rule.shift());
+
     return setRules(selector, cssRules);
   };
 
@@ -52,11 +69,14 @@ function LifeStyleFactory({styleSheet, createWithId}) {
     return setRules(selector, rulesObj);
   };
 
-  return (cssBlockOrSelector, rulesObj = {}) =>
-    checkParams(cssBlockOrSelector, rulesObj) && (
+  return (cssBlockOrSelector, rulesObj = {}) => {
+    const checksOk = checkParams(cssBlockOrSelector, rulesObj);
+
+    return checksOk && (
       Object.keys(rulesObj).length ?
         styleFromObject(cssBlockOrSelector, rulesObj) :
         styleFromString(cssBlockOrSelector) );
+  };
 }
 
 function getHelpers({styleSheet, createWithId}) {
