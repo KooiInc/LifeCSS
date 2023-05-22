@@ -110,10 +110,8 @@ function getHelpers({styleSheet, createWithId}) {
 
   const checkAtRules = (cssDeclarationString) =>
     /@import|@charset|@font-face/i.test(cssDeclarationString) ?
-      { existing: tryParse(cssDeclarationString, 0), done: true } :
-      atRulesRE.test(cssDeclarationString) ?
-        { ok: tryParse(cssDeclarationString, styleSheet.cssRules.length), done: true } :
-        { ok: false, done: false };
+        { existing: tryParse(cssDeclarationString, 0), done: true } : atRulesRE.test(cssDeclarationString) ?
+        { ok: tryParse(cssDeclarationString, styleSheet.cssRules.length), done: true } : { ok: false, done: false };
 
   const ISOneOf = (obj, ...params) => !!params.find( param => IS(obj, param) );
   const IS = (obj, ...shouldBe) => {
@@ -133,7 +131,7 @@ function getHelpers({styleSheet, createWithId}) {
     | @layer | @namespace | @page | @counter-style | @container | @media ${[`i`]}`;
 
   const cssRuleFromText = rule => {
-    rule = !/\n/.test(rule) ? rule.split(`;`).join(`;\n`) : rule;
+    rule = rule.replace(/\n|\r|\r\n/g, ``).split(/;/).map(l => l.trim()).join(`;\n`);
     return rule
       .trim()
       .replace(/[}{]/, ``)
