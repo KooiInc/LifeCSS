@@ -2,7 +2,7 @@ export default LifeStyleFactory;
 
 function LifeStyleFactory({styleSheet, createWithId}) {
   const { cssRuleFromText, checkAtRules, toDashedNotation, IS, shortenRule, consider,
-    ruleExists, checkParams, atMedia2String, sheet, compareSelectors } = getHelpers({styleSheet, createWithId});
+    ruleExists, checkParams, atMedia2String, sheet, compareSelectors } = allHelpers({styleSheet, createWithId});
 
   const setRule4Selector = (rule, properties) => {
     if (rule && properties.removeProperties) {
@@ -80,7 +80,7 @@ function LifeStyleFactory({styleSheet, createWithId}) {
   };
 }
 
-function getHelpers({styleSheet, createWithId}) {
+function allHelpers({styleSheet, createWithId}) {
   const notification = `Note: The rule or some of its properties may not be supported by your browser (yet)`;
 
   const escape4RegExp = str => str.replace(/([*\[\]()-+{}.$?\\])/g, '\\$1');
@@ -130,18 +130,22 @@ function getHelpers({styleSheet, createWithId}) {
   const atRulesRE = createRE`@keyframes | @font-feature-values | @font-palette-values 
     | @layer | @namespace | @page | @counter-style | @container | @media ${[`i`]}`;
 
-  const cssRuleFromText = rule => {
-    rule = rule.replace(/\n|\r|\r\n/g, ``).split(/;/).map(l => l.trim()).join(`;\n`);
-    return rule
-      .trim()
-      .replace(/[}{]/, ``)
-      .split(`\n`).map(r => r.trim())
-      .filter(v => v).reduce( (acc, v) => {
-        const [key, value] = [
-          v.slice(0, v.indexOf(`:`)).trim(),
-          v.slice(v.indexOf(`:`) + 1).trim().replace(/;$|;.+(?=\/*).+\/$/, ``)];
-        return key && value ? {...acc, [key]: value} : acc; }, {} );
-  };
+  const toRuleObject = preparedRule => preparedRule
+    .reduce( (acc, v) => {
+      const [key, value] = [
+        v.slice(0, v.indexOf(`:`)).trim(),
+        v.slice(v.indexOf(`:`) + 1).trim().replace(/;$|;.+(?=\/*).+\/$/, ``)];
+      return key && value ? {...acc, [key]: value} : acc; }, {} );
+
+  const prepareCssRuleFromText = rule =>
+    rule.replace(/[}{\r\n]/g, ``)
+      .split(`;`)
+      .map(l => l.trim())
+      .join(`;\n`)
+      .split(`\n`);
+
+  const cssRuleFromText = rule => toRuleObject(prepareCssRuleFromText(rule));
+
   const toDashedNotation = str2Convert =>
     str2Convert.replace(/[A-Z]/g, a => `-${a.toLowerCase()}`).replace(/[^--]^-|-$/, ``);
 
