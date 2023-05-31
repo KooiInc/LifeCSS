@@ -55,7 +55,7 @@ Your script is a regular (non module) script
 ### Syntax
 
 ```
-[imported cssEditor](rule: string)
+[created cssEditor](rule: string)
  ∟ add/modify a complete css [rule]
 
 [created cssEditor](selector: string, rules: Object)
@@ -64,7 +64,7 @@ Your script is a regular (non module) script
 [created cssEditor](selector: string, {removeRule: true})
  ∟ remove a complete rule identified with [selector]
 
-[imported cssEditor](selector: string, {removeProperties: { Object }})
+[created cssEditor](selector: string, {removeProperties: { Object }})
  ∟ remove properties [removeProperties] from the rule with [selector]
 ```
 
