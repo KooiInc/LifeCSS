@@ -90,7 +90,7 @@ myCssEdit(`.warn`, { color: `red`, fontWeight: `bold`, backgroundColor: `#ffffc0
 // You can remove a complete rule using
 myCssEdit(`.warn`, { removeRule: 1 });
 
-// You can remove properties from a rule using~~~~
+// You can remove properties from a rule using
 myCssEdit(`.warn`, { removeProperties: { fontWeight: 1, "background-color": 1 } });
 
 // That's all folks.
