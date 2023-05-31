@@ -1,6 +1,6 @@
 {
   "name": "lifecss",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "Create style rules in situ",
   "keywords": ["CSS", "Stylesheet", "utility"],
   "author": "KooiInc",
@@ -11,6 +11,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/KooiInc/LifeCSS.git"
+    "url": "https://github.com/KooiInc/LifeCSS"
   }
 }
