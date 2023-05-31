@@ -64,7 +64,9 @@ Your script is a regular (non module) script
 **Notes**:
 - `!important will be honored`
 - Most pseudo selectors (e.g. `::after`, `::no~~~~t(...)`) will work as expected.
-  - For special characters, use a double escape, e.g. `content: '\\1F44D'` 
+  - For special characters, use a double escape, e.g. `content: '\\1F44D'`
+- When an edit did not worked, the error is shown in the console.  
+  most times that will not break further script execution.
 
 **Examples**:
 
