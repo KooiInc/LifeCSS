@@ -197,5 +197,5 @@ function allHelpers({styleSheet, createWithId}) {
   return {
     sheet: styleSheet,
     cssRuleFromText, checkAtRules, ruleExists, atMedia2String, compareSelectors,
-    toDashedNotation, checkParams, tryParse, consider, IS, shortenRule};
+    toDashedNotation, checkParams, tryParse, consider, IS, shortenRule };
 }
