@@ -15,26 +15,19 @@ npm -i lifecss
 Your script is of type `module`;
 
 ```html
-
 <script type="module">
   import cssEditFactory from "https://kooiinc.github.io/LifeCSS/";
   // or
   const cssEditFactory = (await import("https://kooiinc.github.io/LifeCSS/")).default;
   // this will create an editor and a stylesheet with id #myCustomStylesheet in the document header. 
-  const myCssEdit = cssEditFactory({createWithId: `#myCustomStylesheet`})
-  )
-  ;
+  const myCssEdit = cssEditFactory({createWithId: `#myCustomStylesheet`});
 
   // this will create an editor for an existing stylesheet in the document
-  const myCssEdit = cssEditFactory({styleSheet: document.styles[0]})
-  )
-  ;
+  const myCssEdit = cssEditFactory({styleSheet: document.styles[0]}));
 
   // or
   const myCustomSheet = document.querySelector(`#myCustomStylesheet`).sheet;
-  const myCssEdit = cssEditFactory({styleSheet: myCustomSheet)
-  )
-  ;
+  const myCssEdit = cssEditFactory({styleSheet: myCustomSheet));
   // ... your code
 </script>
 ``` 
@@ -56,19 +49,24 @@ Your script is a regular (non module) script
 
 ```
 [created cssEditor](rule: string)
- ∟ add/modify a complete css [rule]
+  ∟ add/modify a complete css [rule]
 
 [created cssEditor](selector: string, rules: Object)
- ∟ add/modify properties of the rule with [selector] 
+  ∟ add/modify properties of the rule with [selector] 
 
 [created cssEditor](selector: string, {removeRule: true})
- ∟ remove a complete rule identified with [selector]
+  ∟ remove a complete rule identified with [selector]
 
 [created cssEditor](selector: string, {removeProperties: { Object }})
- ∟ remove properties [removeProperties] from the rule with [selector]
+  ∟ remove properties [removeProperties] from the rule with [selector]
 ```
 
-**Examples**
+**Notes**:
+- `!important will be honored`
+- Most pseudo selectors (e.g. `::after`, `::no~~~~t(...)`) will work as expected.
+  - For special characters, use a double escape, e.g. `content: '\\1F44D'` 
+
+**Examples**:
 
 ```javascript
 // You created or retrieved a stylesheet editor named myCssEdit
