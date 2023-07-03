@@ -65,8 +65,8 @@ Your script is a regular (non module) script
 - `!important will be honored`
 - Most pseudo selectors (e.g. `::after`, `::not(...)`) will work as expected.
   - For special characters, use a double escape, e.g. `content: '\\1F44D'`
-- When an edit did not worked, the error is shown in the console.  
-  most times that will not break further script execution.
+- When an edit did not work, the error is shown in the console.  
+  That should not break further script execution.
 
 **Examples**:
 
@@ -98,3 +98,6 @@ myCssEdit(`.warn`, { removeProperties: { fontWeight: 1, "background-color": 1 } 
 
 ### Example
 A comprehensive example can be found [@Stackblitz](https://stackblitz.com/edit/js-fnxaro?file=index.js).
+
+The module is also used in my [JQL (*JQu*ery*L*ike)](https://github.com/KooiInc/JQL) module.
+
