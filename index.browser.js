@@ -1,12 +1,14 @@
-window.LifeStyleFactory = function ({styleSheet, createWithId}) {
-  const { cssRuleFromText, checkAtRules, toDashedNotation, IS, shortenRule, consider,
+window.LifeStyleFactory = LifeStyleFactory;
+
+function LifeStyleFactory({styleSheet, createWithId}) {
+  const { cssRuleFromText, checkAtRules, toDashedNotation, IS, shortenRule, consider, tryAndCatch,
     ruleExists, checkParams, atMedia2String, sheet, compareSelectors } = allHelpers({styleSheet, createWithId});
 
   const setRule4Selector = (rule, properties) => {
     if (rule && properties.removeProperties) {
-      Object.keys(properties.removeProperties).forEach(prop => {
+      tryAndCatch( () => Object.keys(properties.removeProperties).forEach(prop => {
         rule.style.removeProperty(prop);
-      });
+      }), `StylingFactory instance (remove property/properties) failed` );
       return;
     }
 
@@ -19,7 +21,8 @@ window.LifeStyleFactory = function ({styleSheet, createWithId}) {
           priority = `important`;
         }
 
-        rule.style.setProperty(toDashedNotation(prop), value, priority);
+        tryAndCatch( () => rule.style.setProperty(toDashedNotation(prop), value, priority),
+          `StylingFactory instance (setRule4Selector) failed`);
       });
   }
 
@@ -53,7 +56,7 @@ window.LifeStyleFactory = function ({styleSheet, createWithId}) {
 
     const cssRules =  cssRuleFromText(rule.shift());
 
-    return setRules(selector, cssRules);
+    return tryAndCatch( () => setRules(selector, cssRules), `StylingFactory instance (setRules) failed`  );
   };
 
   const styleFromString = cssDeclarationString => {
@@ -108,7 +111,7 @@ function allHelpers({styleSheet, createWithId}) {
 
   const checkAtRules = (cssDeclarationString) =>
     /@import|@charset|@font-face/i.test(cssDeclarationString) ?
-        { existing: tryParse(cssDeclarationString, 0), done: true } : atRulesRE.test(cssDeclarationString) ?
+      { existing: tryParse(cssDeclarationString, 0), done: true } : atRulesRE.test(cssDeclarationString) ?
         { ok: tryParse(cssDeclarationString, styleSheet.cssRules.length), done: true } : { ok: false, done: false };
 
   const ISOneOf = (obj, ...params) => !!params.find( param => IS(obj, param) );
@@ -160,6 +163,11 @@ function allHelpers({styleSheet, createWithId}) {
     return rule.length > shortRule.length ? `${shortRule.trim()}...truncated`  : shortRule;
   }
 
+  const tryAndCatch = (fn, msg) => {
+    try { return fn(); }
+    catch(err) { console.error( `${msg || `an error occured`}: ${err.message}` ); }
+  }
+
   const tryParse = cssDeclarationString => {
     cssDeclarationString = cssDeclarationString.trim();
     const exists = !!ruleExists(cssDeclarationString.slice(0, cssDeclarationString.indexOf(`{`)));
@@ -193,7 +201,7 @@ function allHelpers({styleSheet, createWithId}) {
       `${selectr}: { ${stringifyMediaRule(rule) }` ) }` ;
 
   return {
-    sheet: styleSheet,
+    sheet: styleSheet, tryAndCatch,
     cssRuleFromText, checkAtRules, ruleExists, atMedia2String, compareSelectors,
-    toDashedNotation, checkParams, tryParse, consider, IS, shortenRule};
+    toDashedNotation, checkParams, tryParse, consider, IS, shortenRule };
 }
