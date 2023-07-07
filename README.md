@@ -2,6 +2,8 @@
 
 A small library to add, remove or modify css rules in situ.
 
+The module is also used in my [JQL (*JQu*ery*L*ike)](https://github.com/KooiInc/JQL) module.
+
 ## Usage
 
 ### Install
@@ -98,6 +100,4 @@ myCssEdit(`.warn`, { removeProperties: { fontWeight: 1, "background-color": 1 } 
 
 ### Example
 A comprehensive example can be found [@Stackblitz](https://stackblitz.com/edit/js-fnxaro?file=index.js).
-
-The module is also used in my [JQL (*JQu*ery*L*ike)](https://github.com/KooiInc/JQL) module.
 
