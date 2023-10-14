@@ -14,8 +14,9 @@ function LifeStyleFactory({styleSheet, createWithId}) {
     
     Object.entries(properties)
       .forEach( ([prop, value]) => {
-        prop = prop.trim();
+        prop = toDashedNotation(prop.trim());
         value = value.trim();
+        
         let priority;
         
         if (/!important/.test(value)) {
@@ -28,7 +29,7 @@ function LifeStyleFactory({styleSheet, createWithId}) {
             prop}' with value '${value}' not supported (yet)`);
         }
         
-        tryAndCatch( () => rule.style.setProperty(toDashedNotation(prop), value, priority),
+        tryAndCatch( () => rule.style.setProperty(prop, value, priority),
           `StylingFactory instance (setRule4Selector) failed`);
       });
   }
