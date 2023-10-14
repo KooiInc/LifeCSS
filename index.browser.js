@@ -146,7 +146,9 @@ function allHelpers({styleSheet, createWithId}) {
       return key && value ? {...acc, [key]: value} : acc; }, {} );
 
   const prepareCssRuleFromText = rule =>
-    rule.replace(/[}{\r\n]/g, ``)
+    rule
+      .replace(/\/\*.+?\*\//gm, ``)
+      .replace(/[}{\r\n]/g, ``)
       .split(`;`)
       .map(l => l.trim())
       .join(`;\n`)
