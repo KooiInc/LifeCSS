@@ -3,7 +3,7 @@ export default LifeStyleFactory;
 function LifeStyleFactory({styleSheet, createWithId}) {
   const { cssRuleFromText, checkAtRules, toDashedNotation, IS, shortenRule, consider, tryAndCatch,
     ruleExists, checkParams, atMedia2String, sheet, compareSelectors } = allHelpers({styleSheet, createWithId});
-
+  
   const setRule4Selector = (rule, properties) => {
     if (rule && properties.removeProperties) {
       tryAndCatch( () => Object.keys(properties.removeProperties).forEach(prop => {
@@ -11,21 +11,28 @@ function LifeStyleFactory({styleSheet, createWithId}) {
       }), `StylingFactory instance (remove property/properties) failed` );
       return;
     }
-
+    
     Object.entries(properties)
       .forEach( ([prop, value]) => {
+        prop = prop.trim();
+        value = value.trim();
         let priority;
-
+        
         if (/!important/.test(value)) {
           value = value.slice(0, value.indexOf(`!important`)).trim();
           priority = `important`;
         }
-
+        
+        if (!CSS.supports(prop, value)) {
+          return console.error(`StylingFactory instance error: '${
+            prop}' with value '${value}' not supported (yet)`);
+        }
+        
         tryAndCatch( () => rule.style.setProperty(toDashedNotation(prop), value, priority),
           `StylingFactory instance (setRule4Selector) failed`);
       });
   }
-
+  
   const setRules = (selector, styleRules, sheetOrMediaRules = sheet) => {
     if (!IS(selector, String) || !selector.trim().length || /[;,]$/g.test(selector.trim())) {
       return console.error(`StylingFactory instance (setRules): [${
@@ -128,7 +135,7 @@ function allHelpers({styleSheet, createWithId}) {
       self?.name ?? invalid;
   };
 
-  const atRulesRE = createRE`@keyframes | @font-feature-values | @font-palette-values 
+  const atRulesRE = createRE`@keyframes | @font-feature-values | @font-palette-values
     | @layer | @namespace | @page | @counter-style | @container | @media ${[`i`]}`;
 
   const toRuleObject = preparedRule => preparedRule
