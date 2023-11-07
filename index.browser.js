@@ -7,7 +7,7 @@ function LifeStyleFactory({styleSheet, createWithId}) {
   const setRule4Selector = (rule, properties) => {
     if (rule && properties.removeProperties) {
       tryAndCatch( () => Object.keys(properties.removeProperties).forEach(prop => {
-        rule.style.removeProperty(prop);
+        rule.style.removeProperty(toDashedNotation(prop));
       }), `StylingFactory instance (remove property/properties) failed` );
       return;
     }
