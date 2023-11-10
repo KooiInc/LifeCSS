@@ -146,14 +146,17 @@ function allHelpers({styleSheet, createWithId}) {
         v.slice(v.indexOf(`:`) + 1).trim().replace(/;$|;.+(?=\/*).+\/$/, ``)];
       return key && value ? {...acc, [key]: value} : acc; }, {} );
   
-  const prepareCssRuleFromText = rule =>
-    rule
+  const prepareCssRuleFromText = rule => {
+    return rule
       .replace(/\/\*.+?\*\//gm, ``)
       .replace(/[}{\r\n]/g, ``)
+      .replace(/(data:.+?);/g, (_,b) => `${b}\\3b`)
       .split(`;`)
       .map(l => l.trim())
       .join(`;\n`)
+      .replaceAll(`\\3b`, `;`)
       .split(`\n`);
+  };
   
   const cssRuleFromText = rule => toRuleObject(prepareCssRuleFromText(rule));
   
