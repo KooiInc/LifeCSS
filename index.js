@@ -121,18 +121,13 @@ function allHelpers({styleSheet, createWithId}) {
         { ok: tryParse(cssDeclarationString, styleSheet.cssRules.length), done: true } : { ok: false, done: false };
   
   const removeRules = (selector, sheet) => {
-    let i = 0;
-    const finder = r => compareSelectors((r.selectorText || ``), selector);
-    let index = [...sheet.cssRules].findIndex(finder);
+    const rulesAt = [...sheet.cssRules].reduce( (acc, v, i) =>
+      compareSelectors(v.selectorText || ``, selector) && acc.concat(i) || acc, [] );
+    const len = rulesAt.length;
+    rulesAt.forEach(indx => sheet.deleteRule(indx))
     
-    while (index > -1) {
-      i += 1;
-      sheet.deleteRule(index);
-      index = [...sheet.cssRules].findIndex(finder);
-    }
-    
-    return i > 0
-      ? console.info(`✔ Removed ${i} instance${i > 1 ? `s` : ``} of selector ${selector}`)
+    return len > 0
+      ? console.info(`✔ Removed ${len} instance${len > 1 ? `s` : ``} of selector ${selector}`)
       : console.info(`✔ Remove rule: selector ${selector} does not exist`);
   }
   
