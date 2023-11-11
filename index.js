@@ -41,7 +41,7 @@ function LifeStyleFactory({styleSheet, createWithId}) {
     }
     
     if (styleRules.removeRule) {
-      return removeRules(selector, sheet);
+      return removeRules(selector);
     }
     
     const exists = ruleExists(selector, true);
@@ -120,11 +120,11 @@ function allHelpers({styleSheet, createWithId}) {
       { existing: tryParse(cssDeclarationString, 0), done: true } : atRulesRE.test(cssDeclarationString) ?
         { ok: tryParse(cssDeclarationString, styleSheet.cssRules.length), done: true } : { ok: false, done: false };
   
-  const removeRules = (selector, sheet) => {
-    const rulesAt = [...sheet.cssRules].reduce( (acc, v, i) =>
+  const removeRules = selector => {
+    const rulesAt = [...styleSheet.cssRules].reduce( (acc, v, i) =>
       compareSelectors(v.selectorText || ``, selector) && acc.concat(i) || acc, [] );
     const len = rulesAt.length;
-    rulesAt.forEach(indx => sheet.deleteRule(indx))
+    rulesAt.forEach(indx => styleSheet.deleteRule(indx));
     
     return len > 0
       ? console.info(`✔ Removed ${len} instance${len > 1 ? `s` : ``} of selector ${selector}`)
@@ -223,7 +223,7 @@ function allHelpers({styleSheet, createWithId}) {
       `${selectr}: { ${stringifyMediaRule(rule) }` ) }` ;
   
   return {
-    sheet: styleSheet, tryAndCatch, removeRules,
-    cssRuleFromText, checkAtOrAmpersandRules, ruleExists, atMedia2String, compareSelectors,
-    toDashedNotation, checkParams, tryParse, consider, IS, shortenRule };
+    sheet: styleSheet, tryAndCatch, removeRules, cssRuleFromText, checkAtOrAmpersandRules,
+    ruleExists, atMedia2String, compareSelectors, toDashedNotation, checkParams, tryParse,
+    consider, IS, shortenRule };
 }
