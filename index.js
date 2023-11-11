@@ -132,7 +132,7 @@ function allHelpers({styleSheet, createWithId}) {
     }
     
     return i > 0
-      ? console.info(`✔ Removed ${i} instance(s) of selector ${selector}`)
+      ? console.info(`✔ Removed ${i} instance${i > 1 ? `s` : ``} of selector ${selector}`)
       : console.info(`✔ Remove rule: selector ${selector} does not exist`);
   }
   

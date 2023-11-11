@@ -123,7 +123,7 @@ function allHelpers({styleSheet, createWithId}) {
   const removeRules = (selector, sheet) => {
     let i = 0;
     const finder = r => compareSelectors((r.selectorText || ``), selector);
-    let index = [...sheet.rules].findIndex(r => compareSelectors((r.selectorText || ``), selector) );
+    let index = [...sheet.cssRules].findIndex(finder);
     
     while (index > -1) {
       i += 1;
@@ -132,7 +132,7 @@ function allHelpers({styleSheet, createWithId}) {
     }
     
     return i > 0
-      ? console.info(`✔ Removed ${i} instance(s) of selector ${selector}`)
+      ? console.info(`✔ Removed ${i} instance${i > 1 ? `s` : ``} of selector ${selector}`)
       : console.info(`✔ Remove rule: selector ${selector} does not exist`);
   }
   
