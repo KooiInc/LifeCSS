@@ -2,7 +2,7 @@ window.LifeStyleFactory = LifeStyleFactory;
 
 function LifeStyleFactory({styleSheet, createWithId}) {
   const { cssRuleFromText, checkAtOrAmpersandRules, toDashedNotation, IS, shortenRule, consider, tryAndCatch,
-    ruleExists, checkParams, atMedia2String, sheet, compareSelectors } = allHelpers({styleSheet, createWithId});
+    ruleExists, checkParams, atMedia2String, sheet, removeRules } = allHelpers({styleSheet, createWithId});
   
   const setRule4Selector = (rule, properties) => {
     if (rule && properties.removeProperties) {
@@ -40,15 +40,13 @@ function LifeStyleFactory({styleSheet, createWithId}) {
         selector || `[no selector given]` }] is not a valid selector`);
     }
     
+    if (styleRules.removeRule) {
+      return removeRules(selector, sheet);
+    }
+    
     const exists = ruleExists(selector, true);
     const rule4Selector = exists
       || sheetOrMediaRules.cssRules[sheetOrMediaRules.insertRule(`${selector} {}`, sheetOrMediaRules.cssRules.length || 0)];
-    
-    if (styleRules.removeRule) {
-      if (!exists) { return console.error(`Remove rule: ${selector} does not exist`); }
-      const ruleIndex =  [...sheet.rules].findIndex(r => compareSelectors((r.selectorText || ``), selector) );
-      return consider( () => sheet.deleteRule(ruleIndex) );
-    }
     
     return consider( () => setRule4Selector(rule4Selector, styleRules), selector, exists );
   };
@@ -122,6 +120,22 @@ function allHelpers({styleSheet, createWithId}) {
       { existing: tryParse(cssDeclarationString, 0), done: true } : atRulesRE.test(cssDeclarationString) ?
         { ok: tryParse(cssDeclarationString, styleSheet.cssRules.length), done: true } : { ok: false, done: false };
   
+  const removeRules = (selector, sheet) => {
+    let i = 0;
+    const finder = r => compareSelectors((r.selectorText || ``), selector);
+    let index = [...sheet.rules].findIndex(r => compareSelectors((r.selectorText || ``), selector) );
+    
+    while (index > -1) {
+      i += 1;
+      sheet.deleteRule(index);
+      index = [...sheet.cssRules].findIndex(finder);
+    }
+    
+    return i > 0
+      ? console.info(`✔ Removed ${i} instance(s) of selector ${selector}`)
+      : console.info(`✔ Remove rule: selector ${selector} does not exist`);
+  }
+  
   const ISOneOf = (obj, ...params) => !!params.find( param => IS(obj, param) );
   const IS = (obj, ...shouldBe) => {
     if (shouldBe.length > 1) {
@@ -156,7 +170,7 @@ function allHelpers({styleSheet, createWithId}) {
       .join(`;\n`)
       .replaceAll(`\\3b`, `;`)
       .split(`\n`);
-  };
+  }
   
   const cssRuleFromText = rule => toRuleObject(prepareCssRuleFromText(rule));
   
@@ -214,7 +228,7 @@ function allHelpers({styleSheet, createWithId}) {
       `${selectr}: { ${stringifyMediaRule(rule) }` ) }` ;
   
   return {
-    sheet: styleSheet, tryAndCatch,
+    sheet: styleSheet, tryAndCatch, removeRules,
     cssRuleFromText, checkAtOrAmpersandRules, ruleExists, atMedia2String, compareSelectors,
     toDashedNotation, checkParams, tryParse, consider, IS, shortenRule };
 }
