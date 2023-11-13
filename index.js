@@ -196,13 +196,13 @@ function allHelpers({styleSheet, createWithId}) {
     catch(err) { console.error( `${msg || `an error occured`}: ${err.message}` ); }
   }
   
-  const tryParse = (cssDeclarationString, atIndex) => {
+  const tryParse = (cssDeclarationString) => {
     cssDeclarationString = cssDeclarationString.trim();
     const rule = cssDeclarationString.slice(0, cssDeclarationString.indexOf(`{`));
     const exists = !!ruleExists(rule);
     
     try {
-      return (styleSheet.insertRule(`${cssDeclarationString}`, +atIndex || styleSheet.cssRules.length), exists);
+      return (styleSheet.insertRule(`${cssDeclarationString}`, styleSheet.cssRules.length), exists);
     } catch(err) {
       return (console.error(`StylingFactory ${currentSheet} (tryParse) ${err.name} Error:\n${
         err.message}\nRule: ${
