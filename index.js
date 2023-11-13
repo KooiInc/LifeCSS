@@ -101,8 +101,13 @@ function allHelpers({styleSheet, createWithId}) {
   }
   
   styleSheet = createWithId ? retrieveOrCreateSheet(createWithId) : styleSheet;
-  const notSupported = rule => `StylingFactory ${currentSheet} [rule: ${rule}]
-    => @charset, @namespace and @import are not supported here`;
+  
+  const notSupported = rule => {
+    console.error(`StylingFactory ${currentSheet} [rule: ${rule}]
+    => @charset, @namespace and @import are not supported here`);
+    return {done: true};
+  };
+  
   const createRE = (regexStr, ...args) => {
     const flags = args.length && Array.isArray(args.slice(-1)) ? args.pop().join(``) : ``;
     
@@ -122,11 +127,11 @@ function allHelpers({styleSheet, createWithId}) {
   
   const tryParseAtOrNestedRules = cssDeclarationString =>
     /^@charset|@import|namespace/i.test(cssDeclarationString.trim()) ?
-      (console.error(notSupported(cssDeclarationString)), {done: true})
-      : /(&.+{.+?}|@media|@supports|@layer|@scope|@container)/mi.test(cssDeclarationString) ?
-        { existing: tryParse(cssDeclarationString, 1), done: true }
-        : cssDeclarationString.trim().startsWith(`@`) ?
-          { ok: tryParse(cssDeclarationString, styleSheet.cssRules.length), done: true }
+      notSupported(cssDeclarationString) :
+      cssDeclarationString.trim().startsWith(`@`) ?
+        { ok: tryParse(cssDeclarationString, styleSheet.cssRules.length), done: true } :
+        /([&.#:].+{.+?}|@media|@supports|@layer|@scope|@container)/mi.test(cssDeclarationString) ?
+          { existing: tryParse(cssDeclarationString, 1), done: true }
           : { ok: false, done: false };
   
   const removeRules = selector => {
