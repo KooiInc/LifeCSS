@@ -1,10 +1,11 @@
 window.LifeStyleFactory = LifeStyleFactory;
 
+/* region factory */
 function LifeStyleFactory({styleSheet, createWithId} = {}) {
-  const { cssRuleFromText, tryParseAtOrNestedRules, toDashedNotation, IS, shortenRule, consider, tryAndCatch,
-    ruleExists, checkParams, atMedia2String, sheet, removeRules, currentSheet } = allHelpers({styleSheet, createWithId});
+  const { tryParseAtOrNestedRules, ruleExists, checkParams,
+    sheet, removeRules, consider, currentSheetID } = sheetHelpers({styleSheet, createWithId});
   
-  const setRules4Selector = (rule, properties) => {
+  function setRules4Selector(rule, properties) {
     if (rule && properties.removeProperties) {
       Object.keys(properties.removeProperties)
         .forEach( prop => rule.style.removeProperty(toDashedNotation(prop)) );
@@ -24,18 +25,19 @@ function LifeStyleFactory({styleSheet, createWithId} = {}) {
         }
         
         if (!CSS.supports(prop, value)) {
-          return console.error(`StylingFactory ${currentSheet} error: '${
+          return console.error(`StylingFactory ${currentSheetID} error: '${
             prop}' with value '${value}' not supported (yet)`);
         }
         
         tryAndCatch( () => rule.style.setProperty(prop, value, priority),
-          `StylingFactory ${currentSheet} (setRule4Selector) failed`);
+          `StylingFactory ${currentSheetID} (setRule4Selector) failed`);
       });
   }
   
-  const setRules = (selector, styleRules, sheetOrMediaRules = sheet) => {
-    if (!IS(selector, String) || !selector.trim().length || /[;,]$/g.test(selector.trim())) {
-      return console.error(`StylingFactory ${currentSheet} (setRules): [${
+  function setRules(selector, styleRules, sheetOrMediaRules = sheet) {
+    selector = selector?.trim?.();
+    if (!IS(selector, String) || !selector.length || /[;,]$/g.test(selector)) {
+      return console.error(`StylingFactory ${currentSheetID} (setRules): [${
         selector || `[no selector given]` }] is not a valid selector`);
     }
     
@@ -48,35 +50,35 @@ function LifeStyleFactory({styleSheet, createWithId} = {}) {
       || sheetOrMediaRules.cssRules[sheetOrMediaRules.insertRule(`${selector} {}`, sheetOrMediaRules.cssRules.length || 0)];
     
     return consider( () => setRules4Selector(rule4Selector, styleRules), selector, exists );
-  };
+  }
   
-  const doParse = cssDeclarationString => {
+  function doParse(cssDeclarationString) {
     const rule = cssDeclarationString.trim().split(/{/, 2);
     const selector = rule.shift().trim();
     
-    if (!IS(selector, String) || !selector.trim()) {
-      return console.error(`StylingFactory ${currentSheet} (doParse): no (valid) selector could be extracted from rule ${
+    if (!IS(selector, String) || !selector?.trim()?.length) {
+      return console.error(`StylingFactory ${currentSheetID} (doParse): no (valid) selector could be extracted from rule ${
         shortenRule(cssDeclarationString)}`);
     }
     
     const cssRules =  cssRuleFromText(rule.shift());
     
-    return tryAndCatch( () => setRules(selector, cssRules), `StylingFactory ${currentSheet} (setRules) failed`  );
-  };
+    return tryAndCatch( () => setRules(selector, cssRules), `StylingFactory ${currentSheetID} (setRules) failed`  );
+  }
   
-  const styleFromString = cssDeclarationString => {
+  function styleFromString(cssDeclarationString) {
     const checkAts = tryParseAtOrNestedRules(cssDeclarationString);
     return checkAts.done ? checkAts.existing : doParse(cssDeclarationString);
   }
   
-  const styleFromObject = (selector, rulesObj) => {
+  function styleFromObject(selector, rulesObj) {
     if (selector.trim().startsWith(`@media`)) {
       return styleFromString(atMedia2String(selector, rulesObj));
     }
     return setRules(selector, rulesObj);
-  };
+  }
   
-  return (cssBlockOrSelector, rulesObj = {}) => {
+  return function(cssBlockOrSelector, rulesObj = {}) {
     const checksOk = checkParams(cssBlockOrSelector, rulesObj);
     
     return checksOk && (
@@ -85,158 +87,190 @@ function LifeStyleFactory({styleSheet, createWithId} = {}) {
         styleFromString(cssBlockOrSelector) );
   };
 }
+/* endregion factory */
 
-function allHelpers({styleSheet, createWithId}) {
+/* region helpers */
+function sheetHelpers({styleSheet, createWithId}) {
   const notification = `Note: The rule or some of its properties may not be supported by your browser (yet)`;
+  const currentSheetID = `for style#${createWithId}`;
+  styleSheet = createWithId ? retrieveOrCreateSheet(createWithId) : styleSheet;
   
-  const escape4RegExp = str => str.replace(/([*\[\]()-+{}.$?\\])/g, a => `\\${a}`);
-  const currentSheet = `for style#${createWithId}`;
-  
-  const retrieveOrCreateSheet = id => {
+  function retrieveOrCreateSheet(id) {
     const existingSheet = document.querySelector(`#${id}`)?.sheet;
+    
     if (existingSheet) { return existingSheet; }
+    
     const newSheet = Object.assign(document.createElement(`style`), { id });
     document.head.insertAdjacentElement(`beforeend`, newSheet);
     return newSheet.sheet;
   }
   
-  styleSheet = createWithId ? retrieveOrCreateSheet(createWithId) : styleSheet;
-  
-  const notSupported = rule => {
-    console.error(`StylingFactory ${currentSheet} [rule: ${rule}]
+  function notSupported(rule) {
+    console.error(`StylingFactory ${currentSheetID} [rule: ${rule}]
     => @charset, @namespace and @import are not supported here`);
     return {done: true};
-  };
+  }
   
-  const createRE = (regexStr, ...args) => {
-    const flags = args.length && Array.isArray(args.slice(-1)) ? args.pop().join(``) : ``;
+  function ruleExists(ruleFragOrSelector, isSelector) {
+    return [...styleSheet.rules].find( r =>
+      isSelector ?
+        compareSelectors((r.selectorText || ``), ruleFragOrSelector) :
+        createRE`${escape4RegExp(ruleFragOrSelector)}${[...`gim`]}`.test(r.cssText));
+  }
+  
+  function tryParseAtOrNestedRules(cssDeclarationString) {
+    if (/^@charset|@import|namespace/i.test(cssDeclarationString.trim())) {
+      return notSupported(cssDeclarationString);
+    }
     
-    return new RegExp(
-      (args.length &&
-        regexStr.raw.reduce( (a, v, i ) => a.concat(args[i-1] || ``).concat(v), ``) ||
-        regexStr.raw.join(``))
-        .split(`\n`)
-        .map( line => line.replace(/\s|\/\/.*$/g, ``).trim().replace(/(@s!)/g, ` `) )
-        .join(``), flags);
-  };
+    if (cssDeclarationString.match(/\}/g)?.length > 1) {
+      return {existing: tryParse(cssDeclarationString, 1), done: true}
+    }
+    
+    return { done: false };
+  }
   
-  const ruleExists = (ruleFragOrSelector, isSelector) => [...styleSheet.rules].find( r =>
-    isSelector ?
-      compareSelectors((r.selectorText || ``), ruleFragOrSelector) :
-      createRE`${escape4RegExp(ruleFragOrSelector)}${[...`gim`]}`.test(r.cssText));
-  
-  const tryParseAtOrNestedRules = cssDeclarationString =>
-    /^@charset|@import|namespace/i.test(cssDeclarationString.trim()) ?
-      notSupported(cssDeclarationString) :
-      cssDeclarationString.trim().startsWith(`@`) ?
-        { ok: tryParse(cssDeclarationString, styleSheet.cssRules.length), done: true } :
-        /([&.#:].+{.+?}|@media|@supports|@layer|@scope|@container)/mi.test(cssDeclarationString) ?
-          { existing: tryParse(cssDeclarationString, 1), done: true }
-          : { ok: false, done: false };
-  
-  const removeRules = selector => {
+  function removeRules(selector) {
     const rulesAt = [...styleSheet.cssRules].reduce( (acc, v, i) =>
       compareSelectors(v.selectorText || ``, selector) && acc.concat(i) || acc, [] );
     const len = rulesAt.length;
     rulesAt.forEach(idx => styleSheet.deleteRule(idx));
     
     return len > 0
-      ? console.info(`✔ Removed ${len} instance${len > 1 ? `s` : ``} of selector ${selector} from ${currentSheet.slice(4)}`)
-      : console.info(`✔ Remove rule: selector ${selector} does not exist in ${currentSheet.slice(4)}`);
+      ? console.info(`✔ Removed ${len} instance${len > 1 ? `s` : ``} of selector ${
+        selector} from ${currentSheetID.slice(4)}`)
+      : console.info(`✔ Remove rule: selector ${selector} does not exist in ${
+        currentSheetID.slice(4)}`);
   }
   
-  const ISOneOf = (obj, ...params) => !!params.find( param => IS(obj, param) );
-  const IS = (obj, ...shouldBe) => {
-    if (shouldBe.length > 1) {
-      return ISOneOf(obj, ...shouldBe);
-    }
-    shouldBe = shouldBe.shift();
-    const invalid = `Invalid parameter(s)`;
-    const self = obj === 0 ? Number : obj === `` ? String :
-      !obj ? {name: invalid} :
-        Object.getPrototypeOf(obj)?.constructor;
-    return shouldBe ? shouldBe === self?.__proto__ || shouldBe === self :
-      self?.name ?? invalid;
-  };
-  
-  const toRuleObject = preparedRule => preparedRule
-    .reduce( (acc, v) => {
-      const [key, value] = [
-        v.slice(0, v.indexOf(`:`)).trim(),
-        v.slice(v.indexOf(`:`) + 1).trim().replace(/;$|;.+(?=\/*).+\/$/, ``)];
-      return key && value ? {...acc, [key]: value} : acc; }, {} );
-  
-  const prepareCssRuleFromText = rule => {
-    return rule
-      .replace(/\/\*.+?\*\//gm, ``)
-      .replace(/[}{\r\n]/g, ``)
-      .replace(/(data:.+?);/g, (_,b) => `${b}\\3b`)
-      .split(`;`)
-      .map(l => l.trim())
-      .join(`;\n`)
-      .replaceAll(`\\3b`, `;`)
-      .split(`\n`);
+  function checkParams(cssBlockOrSelector, rulesObj) {
+    return cssBlockOrSelector
+      && IS(cssBlockOrSelector, String)
+      && cssBlockOrSelector.trim().length > 0
+      && IS(rulesObj, Object) ||
+      (console.error(`StylingFactory ${currentSheetID} called with invalid parameters`), false);
   }
   
-  const cssRuleFromText = rule => toRuleObject(prepareCssRuleFromText(rule));
-  
-  const toDashedNotation = str2Convert =>
-    str2Convert.replace(/[A-Z]/g, a => `-${a.toLowerCase()}`).replace(/[^--]^-|-$/, ``);
-  
-  const compareSelectors = (s1, s2) => s1?.replace(`::`, `:`) === s2?.replace(`::`, `:`);
-  
-  const checkParams = (cssBlockOrSelector, rulesObj) =>
-    cssBlockOrSelector
-    && IS(cssBlockOrSelector, String)
-    && cssBlockOrSelector.trim().length
-    && IS(rulesObj, Object) ||  (console.error(`StylingFactory ${currentSheet} called with invalid parameters`), false);
-  
-  const shortenRule = rule => {
-    const shortRule = (rule || `NO RULE`).trim().slice(0, 50).replace(/\n/g, `\\n`).replace(/\s{2,}/g, ` `);
-    return rule.length > shortRule.length ? `${shortRule.trim()}...truncated`  : shortRule;
-  }
-  
-  const tryAndCatch = (fn, msg) => {
-    try { return fn(); }
-    catch(err) { console.error( `${msg || `an error occured`}: ${err.message}` ); }
-  }
-  
-  const tryParse = (cssDeclarationString) => {
+  function tryParse(cssDeclarationString) {
     cssDeclarationString = cssDeclarationString.trim();
-    const rule = cssDeclarationString.slice(0, cssDeclarationString.indexOf(`{`));
+    const rule = cssDeclarationString.slice(0, cssDeclarationString.indexOf(`{`)).trim();
     const exists = !!ruleExists(rule);
     
     try {
       return (styleSheet.insertRule(`${cssDeclarationString}`, styleSheet.cssRules.length), exists);
     } catch(err) {
-      return (console.error(`StylingFactory ${currentSheet} (tryParse) ${err.name} Error:\n${
+      return (console.error(`StylingFactory ${currentSheetID} (tryParse) ${err.name} Error:\n${
         err.message}\nRule: ${
         shortenRule(cssDeclarationString)}\n${
         notification}`),
         exists);
     }
-  };
+  }
   
-  const consider = (fn, rule, existing) => {
+  function consider(fn, rule, existing) {
     try {
       return (fn(), existing);
     } catch(err) {
-      return (console.error(`StylingFactory ${currentSheet} (tryAddOrModify) ${err.name} Error:\n${
-        err.message}\nRule: ${shortenRule(rule)}\n${
-        notification}`),
-        existing);
+      return (
+        console.error(`StylingFactory ${currentSheetID} (tryAddOrModify) ${err.name} Error:\n${
+          err.message}\nRule: ${shortenRule(rule)}\n${notification}`),
+          existing
+      );
     }
   }
   
-  const stringifyMediaRule = mediaObj => Object.entries(mediaObj)
-    .map( ([key, value]) => `${key}: ${value.trim()}`).join(`;\n`);
-  
-  const atMedia2String = (selector, rulesObj) => `${selector.trim()} ${
-    Object.entries(rulesObj).map( ( [ selectr, rule] ) =>
-      `${selectr}: { ${stringifyMediaRule(rule) }` ) }` ;
-  
   return {
-    sheet: styleSheet, tryAndCatch, removeRules, cssRuleFromText, tryParseAtOrNestedRules,
-    ruleExists, atMedia2String, compareSelectors, toDashedNotation, checkParams, tryParse,
-    consider, IS, shortenRule, currentSheet };
+    sheet: styleSheet, removeRules, tryParseAtOrNestedRules,
+    ruleExists, checkParams, tryParse, consider,
+    currentSheetID };
 }
+/* endregion helpers */
+
+/* region globalOrShared */
+function atMedia2String(selector, rulesObj) {
+  return `${selector.trim()} ${
+    Object.entries(rulesObj).map( ( [ selectr, rule] ) =>
+      `${selectr}: { ${stringifyMediaRule(rule) }` ) }`;
+}
+
+function shortenRule(rule) {
+  const shortRule = (rule || `NO RULE`).trim().slice(0, 50).replace(/\n/g, `\\n`).replace(/\s{2,}/g, ` `);
+  return rule.length > shortRule.length ? `${shortRule.trim()}...truncated`  : shortRule;
+}
+
+function stringifyMediaRule(mediaObj) {
+  return Object.entries(mediaObj)
+    .map( ([key, value]) => `${key}: ${value.trim()}`).join(`;\n`);
+}
+
+function escape4RegExp(str) {
+  return str.replace(/([*\[\]()-+{}.$?\\])/g, a => `\\${a}`);
+}
+
+function ISOneOf(obj, ...params) {
+  return !!params.find( param => IS(obj, param) );
+}
+
+function IS (obj, ...shouldBe) {
+  if (shouldBe.length > 1) {
+    return ISOneOf(obj, ...shouldBe);
+  }
+  shouldBe = shouldBe.shift();
+  const invalid = `Invalid parameter(s)`;
+  const self = obj === 0 ? Number : obj === `` ? String :
+    !obj ? {name: invalid} :
+      Object.getPrototypeOf(obj)?.constructor;
+  return shouldBe ? shouldBe === self?.__proto__ || shouldBe === self :
+    self?.name ?? invalid;
+}
+
+function createRE(regexStr, ...args) {
+  const flags = args.length && Array.isArray(args.slice(-1)) ? args.pop().join(``) : ``;
+  
+  return new RegExp(
+    (args.length &&
+      regexStr.raw.reduce( (a, v, i ) => a.concat(args[i-1] || ``).concat(v), ``) ||
+      regexStr.raw.join(``))
+      .split(`\n`)
+      .map( line => line.replace(/\s|\/\/.*$/g, ``).trim().replace(/(@s!)/g, ` `) )
+      .join(``), flags);
+}
+
+function toDashedNotation(str2Convert) {
+  return str2Convert.replace(/[A-Z]/g, a => `-${a.toLowerCase()}`).replace(/[^--]^-|-$/, ``);
+}
+
+function tryAndCatch(fn, msg) {
+  try { return fn(); }
+  catch(err) { console.error( `${msg || `an error occured`}: ${err.message}` ); }
+}
+
+function prepareCssRuleFromText(rule) {
+  return rule
+    .replace(/\/\*.+?\*\//gm, ``)
+    .replace(/[}{\r\n]/g, ``)
+    .replace(/(data:.+?);/g, (_,b) => `${b}\\3b`)
+    .split(`;`)
+    .map(l => l.trim())
+    .join(`;\n`)
+    .replaceAll(`\\3b`, `;`)
+    .split(`\n`);
+}
+
+function toRuleObject(preparedRule) {
+  return preparedRule
+    .reduce( (acc, v) => {
+      const [key, value] = [
+        v.slice(0, v.indexOf(`:`)).trim(),
+        v.slice(v.indexOf(`:`) + 1).trim().replace(/;$|;.+(?=\/*).+\/$/, ``)];
+      return key && value ? {...acc, [key]: value} : acc; }, {} );
+}
+
+function cssRuleFromText(rule) {
+  return toRuleObject(prepareCssRuleFromText(rule));
+}
+
+function compareSelectors(s1, s2) {
+  return s1?.replace(`::`, `:`) === s2?.replace(`::`, `:`);
+}
+/* endregion globalOrShared */
