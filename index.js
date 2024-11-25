@@ -1,3 +1,4 @@
+import {default as IS} from "../TypeofAnything/typeofany.module.js";
 export default LifeStyleFactory;
 
 /* region factory */
@@ -205,23 +206,6 @@ function stringifyMediaRule(mediaObj) {
 
 function escape4RegExp(str) {
   return str.replace(/([*\[\]()-+{}.$?\\])/g, a => `\\${a}`);
-}
-
-function ISOneOf(obj, ...params) {
-  return !!params.find( param => IS(obj, param) );
-}
-
-function IS (obj, ...shouldBe) {
-  if (shouldBe.length > 1) {
-    return ISOneOf(obj, ...shouldBe);
-  }
-  shouldBe = shouldBe.shift();
-  const invalid = `Invalid parameter(s)`;
-  const self = obj === 0 ? Number : obj === `` ? String :
-    !obj ? {name: invalid} :
-      Object.getPrototypeOf(obj)?.constructor;
-  return shouldBe ? shouldBe === self?.__proto__ || shouldBe === self :
-    self?.name ?? invalid;
 }
 
 function createRE(regexStr, ...args) {
