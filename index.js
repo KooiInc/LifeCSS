@@ -124,7 +124,7 @@ function sheetHelpers({styleSheet, createWithId}) {
       return notSupported(cssDeclarationString);
     }
     
-    if (cssDeclarationString.match(/\}/g)?.length > 1) {
+    if (cssDeclarationString.match(/}/g)?.length > 1) {
       return {existing: tryParse(cssDeclarationString, 1), done: true}
     }
     

@@ -255,7 +255,7 @@ function sheetHelpers({ styleSheet, createWithId }) {
     if (/^@charset|@import|namespace/i.test(cssDeclarationString.trim())) {
       return notSupported(cssDeclarationString);
     }
-    if (cssDeclarationString.match(/\}/g)?.length > 1) {
+    if (cssDeclarationString.match(/}/g)?.length > 1) {
       return { existing: tryParse(cssDeclarationString, 1), done: true };
     }
     return { done: false };
