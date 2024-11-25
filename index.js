@@ -1,4 +1,4 @@
-import {default as IS} from "../TypeofAnything/typeofany.module.js";
+import {default as IS} from "./typeofanything.js";
 export default LifeStyleFactory;
 
 /* region factory */
