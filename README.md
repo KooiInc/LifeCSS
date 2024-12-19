@@ -19,7 +19,7 @@ Your script is of type `module`;
   const myCssEdit = cssEditFactory({createWithId: `#myCustomStylesheet`});
 
   // this will create an editor for an existing stylesheet in the document
-  const myCssEdit = cssEditFactory({styleSheet: document.styles[0]}));
+  const myCssEdit = cssEditFactory({styleSheet: document.styleSheets[0]}));
   // ... your code
 </script>
 ``` 
@@ -31,8 +31,6 @@ Your script is a regular (_non module_) script
 <script src="https://kooiinc.github.io/LifeCSS/index.browser.js"></script>
 <script>
   const cssEditFactory = window.LifeStyleFactory;
-  // optionally remove from global namespace
-  delete window.LifeStyleFactory;
   // ... your code
 </script>
 ```
