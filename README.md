@@ -1,3 +1,6 @@
+<a target="_blank" href="https://bundlephobia.com/package/LifeCSS@latest"><img src="https://badgen.net/bundlephobia/min/lifecss"></a>
+<a target="_blank" href="https://www.npmjs.com/package/lifecss"><img src="https://img.shields.io/npm/v/lifecss.svg?labelColor=cb3837&logo=npm&color=dcfdd9"></a>
+
 # LifeCSS
 
 A small library to add, remove or modify css rules in situ.
@@ -56,7 +59,7 @@ Your script is a regular (_non module_) script
   - For special characters without a unicode character escape prefix (`\u...`)
     within the `content`, escape the backslash e.g. `content: '\\1F44D'`.
     Or indeed use a unicode escape, e.g. `\u{1F4C3}` or '\u1F44D'.
-- Nested css (e.g. `&:hover {...}` can be used.
+- Nested css (e.g. `&:hover {...}`) can be used.
 - When an edit did not work, an error is printed in the console.  
   Errors do not break further script execution.
 
