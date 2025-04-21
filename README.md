@@ -55,7 +55,8 @@ Your script is a regular (_non module_) script
 - Most pseudo selectors (e.g. `:after`, `:not(...)`) will work as expected.
   - For special characters without a unicode character escape prefix (`\u...`)
     within the `content`, escape the backslash e.g. `content: '\\1F44D'`.
-    Or indeed use a unicode escape, e.g. `\u{1F4C3}` or '\u1F44D'. 
+    Or indeed use a unicode escape, e.g. `\u{1F4C3}` or '\u1F44D'.
+- Nested css (e.g. `&:hover {...}` can be used.
 - When an edit did not work, an error is printed in the console.  
   Errors do not break further script execution.
 
