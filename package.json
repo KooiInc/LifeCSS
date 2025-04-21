@@ -16,6 +16,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/KooiInc/LifeCSS"
+    "url": "git+https://github.com/KooiInc/LifeCSS.git"
   }
 }
