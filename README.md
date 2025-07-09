@@ -7,7 +7,7 @@ A small library to add, remove or modify css rules in situ.
 
 The module is also used in my [JQL (*JQu*ery*L*ike)](https://github.com/KooiInc/JQL) module.
 
-The module is mirrored @[CodeBerg.org](https://codeberg.org/KooiInc/LifeCSS).
+The module is mirrored from [Github](https://github.com/KooiInc/LifeCSS) to [CodeBerg.org](https://codeberg.org/KooiInc/LifeCSS).
 
 ## Usage
 
