@@ -1,13 +1,11 @@
-<a target="_blank" href="https://bundlephobia.com/package/LifeCSS@latest"><img src="https://badgen.net/bundlephobia/min/lifecss"></a>
+<a target="_blank" href="https://bundlephobia.com/package/lifecss@latest"><img src="https://badgen.net/bundlephobia/min/lifecss"></a>
 <a target="_blank" href="https://www.npmjs.com/package/lifecss"><img src="https://img.shields.io/npm/v/lifecss.svg?labelColor=cb3837&logo=npm&color=dcfdd9"></a>
 
 # LifeCSS
 
 A small library to add, remove or modify css rules in situ.
 
-The module is also used in my [JQL (*JQu*ery*L*ike)](https://github.com/KooiInc/JQL) module.
-
-The module is mirrored @[CodeBerg.org](https://codeberg.org/KooiInc/LifeCSS).
+This module is mirrored from [Github](https://github.com/KooiInc/LifeCSS) to [CodeBerg.org](https://codeberg.org/KooiInc/LifeCSS). It is also used in my [JQx](https://codeberg.org/KooiInc/JQx) module.
 
 ## Usage
 
