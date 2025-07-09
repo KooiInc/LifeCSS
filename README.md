@@ -1,4 +1,4 @@
-<a target="_blank" href="https://bundlephobia.com/package/LifeCSS@latest"><img src="https://badgen.net/bundlephobia/min/lifecss"></a>
+<a target="_blank" href="https://bundlephobia.com/package/lifecss@latest"><img src="https://badgen.net/bundlephobia/min/lifecss"></a>
 <a target="_blank" href="https://www.npmjs.com/package/lifecss"><img src="https://img.shields.io/npm/v/lifecss.svg?labelColor=cb3837&logo=npm&color=dcfdd9"></a>
 
 # LifeCSS
