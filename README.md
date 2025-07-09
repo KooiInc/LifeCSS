@@ -1,5 +1,6 @@
-<a target="_blank" href="https://bundlephobia.com/package/lifecss@latest"><img src="https://badgen.net/bundlephobia/min/lifecss"></a>
-<a target="_blank" href="https://www.npmjs.com/package/lifecss"><img src="https://img.shields.io/npm/v/lifecss.svg?labelColor=cb3837&logo=npm&color=dcfdd9"></a>
+<a href="https://bundlephobia.com/package/lifecss@latest"><img src="https://camo.githubusercontent.com/efa7d0b9dd398420aca3aa19cb9578649851cff37a3c322413475b6ca8ca9ec5/68747470733a2f2f62616467656e2e6e65742f62756e646c6570686f6269612f6d696e2f6a71782d6573" 
+    data-canonical-src="https://badgen.net/bundlephobia/min/lifecss" style="max-width: 100%;">
+</a><a href="https://www.npmjs.com/package/lifecss"><img src="https://img.shields.io/npm/v/lifecss.svg?labelColor=cb3837&logo=npm&color=dcfdd9"></a>
 
 # LifeCSS
 
