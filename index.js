@@ -1,4 +1,4 @@
-import {default as IS} from "./typeofanything.js";
+import {default as IS} from "./Resource/typeofanything.js";
 export default LifeStyleFactory;
 
 /* region factory */
