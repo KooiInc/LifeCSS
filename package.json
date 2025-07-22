@@ -12,6 +12,7 @@
     "import": "./Bundle/index.min.js",
     "default": "./Bundle/index.min.js"
   },
+  "type": "module",
   "author": "KooiInc",
   "license": "GNU",
   "bugs": {
