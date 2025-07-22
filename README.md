@@ -18,10 +18,10 @@ Your script is of type `module`;
 
 ```html
 <script type="module">
-  // use the bundle
-  import cssEditFactory from "https://kooiinc.github.io/LifeCSS/Bundle/index.min.js";
+  // use the bundle from https://unpkg.com/
+  import cssEditFactory from "https://unpkg.com/lifecss@latest/Bundle/index.min.js";
   // or
-  const cssEditFactory = (await import("https://kooiinc.github.io/LifeCSS/Bundle/index.min.js")).default;
+  const cssEditFactory = (await import("https://unpkg.com/lifecss@latest/Bundle/index.min.js")).default;
   
   // this will create an editor and a stylesheet with id #myCustomStylesheet in the document header. 
   const myCssEdit = cssEditFactory({createWithId: `#myCustomStylesheet`});
@@ -36,8 +36,10 @@ Your script is of type `module`;
 Your script is a regular (_non module_) script
 
 ```html
-<!-- use the bundle -->
-<script src="https://kooiinc.github.io/LifeCSS/Bundle/index.browser.min.js"></script>
+<!-- use the bundle from unpkg.com 
+     note: ./index.browser.js can be used too. It is kept for legacy.
+           but consider it deprecated. It may disappear later. -->
+<script src="https://unpkg.com/lifecss@latest/Bundle/index.browser.min.js"></script>
 <script>
   const cssEditFactory = LifeStyleFactory.default;
   // ... your code
