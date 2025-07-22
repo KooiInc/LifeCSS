@@ -6,7 +6,10 @@
 
 A small library to add, remove or modify css rules in situ.
 
-This module is mirrored from [Github](https://github.com/KooiInc/LifeCSS) to [CodeBerg.org](https://codeberg.org/KooiInc/LifeCSS). It is also used in my [JQx](https://codeberg.org/KooiInc/JQx) module.
+> [!IMPORTANT]
+> As of july 2025 this module is mirrored from [CodeBerg.org](https://codeberg.org/KooiInc/LifeCSS) to [Github](https://github.com/KooiInc/LifeCSS). The Codeberg code is *authorative*.
+
+The module is also used in the [JQx](https://codeberg.org/KooiInc/JQx) module.
 
 ## Usage
 
@@ -15,9 +18,10 @@ Your script is of type `module`;
 
 ```html
 <script type="module">
-  import cssEditFactory from "https://kooiinc.github.io/LifeCSS/index.js";
+  // use the bundle
+  import cssEditFactory from "https://kooiinc.github.io/LifeCSS/Bundle/index.min.js";
   // or
-  const cssEditFactory = (await import("https://kooiinc.github.io/LifeCSS/index.js")).default;
+  const cssEditFactory = (await import("https://kooiinc.github.io/LifeCSS/Bundle/index.min.js")).default;
   
   // this will create an editor and a stylesheet with id #myCustomStylesheet in the document header. 
   const myCssEdit = cssEditFactory({createWithId: `#myCustomStylesheet`});
@@ -32,9 +36,10 @@ Your script is of type `module`;
 Your script is a regular (_non module_) script
 
 ```html
-<script src="https://kooiinc.github.io/LifeCSS/index.browser.js"></script>
+<!-- use the bundle -->
+<script src="https://kooiinc.github.io/LifeCSS/Bundle/index.browser.min.js"></script>
 <script>
-  const cssEditFactory = window.LifeStyleFactory;
+  const cssEditFactory = LifeStyleFactory.default;
   // ... your code
 </script>
 ```
@@ -55,14 +60,11 @@ Your script is a regular (_non module_) script
 ```
 
 **Notes**:
-- `!important will be honored`
-- Most pseudo selectors (e.g. `:after`, `:not(...)`) will work as expected.
-  - For special characters without a unicode character escape prefix (`\u...`)
-    within the `content`, escape the backslash e.g. `content: '\\1F44D'`.
-    Or indeed use a unicode escape, e.g. `\u{1F4C3}` or '\u1F44D'.
-- Nested css (e.g. `&:hover {...}`) can be used.
-- When an edit did not work, an error is printed in the console.  
-  Errors do not break further script execution.
+- [x] `!important will be honored`
+- [x] Most pseudo selectors (e.g. `:after`, `:not(...)`) will work as expected.
+- [x] Nested css (e.g. `&:hover {...}`) will work as expected.
+- [x] For special characters without a unicode character escape prefix (`\u...`) within the `content`, escape the backslash e.g. `content: '\\1F44D'`. Or indeed use a unicode escape, e.g. `\u{1F4C3}` or '\u1F44D'.
+- [x] When an edit did not work, an error is printed in the console. Errors do not break further script execution.
 
 **Examples**:
 

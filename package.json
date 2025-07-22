@@ -1,21 +1,24 @@
 {
   "name": "lifecss",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Create style rules in situ",
   "keywords": [
     "CSS",
     "Stylesheet",
     "utility"
   ],
-  "main": "index.js",
+  "main": "./Bundle/index.browser.min.js",
+  "exports": {
+    "import": "./Bundle/index.min.js",
+    "default": "./Bundle/index.min.js"
+  },
   "author": "KooiInc",
   "license": "GNU",
-  "type": "module",
   "bugs": {
     "url": "https://github.com/KooiInc/LifeCSS/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/KooiInc/LifeCSS.git"
+    "url": "https://codeberg.org/KooiInc/LifeCSS"
   }
 }
