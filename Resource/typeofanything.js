@@ -7,7 +7,6 @@ function TOAFactory(specs = {}) {
   const { useSymbolicExtensions } = specs;
   const { shouldbeIsSingleObject, ISOneOf, isExcept, verifyNothingness, xProxy,
           determineType, addSymbolicExtensions, maybe, $Wrap } = TOAHelpers(IS, useSymbolicExtensions);
-  xProxy.custom();
   
   if (!!useSymbolicExtensions) { addSymbolicExtensions(); }
   
@@ -108,15 +107,16 @@ function AUXHelperFactory() {
   }
   
   function constructor2String(obj) {
-    const ctor = Object.getPrototypeOf(obj)?.constructor;
-    return ctor?.name || TYPE_STRINGS.OBJECT;
+    const ctor = !isNothing(obj, true) ? Object.getPrototypeOf(obj)?.constructor : {name: `unknown`};
+    return ctor.name;
   }
   
-  function createCustomProxy(nativeProxy) {
+  function createCustomProxy(nativeProxy, proxySymbol) {
     Proxy = new nativeProxy(nativeProxy, {
       construct(target, args) {
         const wrappedProxy = new target(...args);
-        wrappedProxy[Symbol.proxy] = `${TYPE_STRINGS.PROXY_PREFIX}${constructor2String(args[0])})`;
+        Object.defineProperty(wrappedProxy, proxySymbol, {
+          value: `${TYPE_STRINGS.PROXY_PREFIX}${constructor2String(args[0])})` });
         return wrappedProxy;
       }
     });
@@ -128,7 +128,7 @@ function AUXHelperFactory() {
     const nativeProxy = Proxy;
     return {
       native() { Proxy = nativeProxy; },
-      custom() { Proxy = createCustomProxy(nativeProxy); } };
+      custom() { Proxy = createCustomProxy(nativeProxy, Symbol.proxy); } };
   }
   
   function processInput(input, ...shouldBe) {
