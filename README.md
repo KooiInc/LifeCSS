@@ -1,6 +1,5 @@
- <a href="https://bundlephobia.com/package/lifecss" rel="nofollow">
-  <img src="https://badgen.net/bundlephobia/min/lifecss"></a> <!-- bundlephobia sometimes breaks -->
-<a href="https://www.npmjs.com/package/lifecss"><img src="https://img.shields.io/npm/v/lifecss.svg?labelColor=cb3837&logo=npm&color=dcfdd9"></a>
+[![](https://deno.bundlejs.com/?q=lifecss@latest&badge)](https://bundlejs.com/?q=lifecss)
+[![](https://img.shields.io/npm/v/lifecss.svg?labelColor=cb3837&logo=npm&color=dcfdd9)](https://www.npmjs.com/package/lifecss)
 
 # LifeCSS
 
